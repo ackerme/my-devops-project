@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chromium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chromium
+  template:
+    metadata:
+      labels:
+        app: chromium
+    spec:
+      containers:
+      - name: browser-container
+        image: yisraelackerman/chromium-app:latest
+        resources:
+          requests:
+            cpu: "500m"
+          limits:
+            cpu: "1000m"
+        env:
+        - name: PUID
+          value: "2000"
+        - name: PGID
+          value: "2500"
+        - name: TZ
+          value: "Asia/Jerusalem"
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /logs
+      volumes:
+      - name: logs-volume
+        hostPath:
+          path: /mnt/chromium-logs
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chromium-service
+spec:
+  selector:
+    app: chromium
+  ports:
+  - port: 8082
+    targetPort: 3000
+  type: NodePort

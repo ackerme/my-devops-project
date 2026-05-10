@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: yisraelackerman/auth-service:latest
+        env:
+        - name: ACCESS_CODE
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: code
+        - name: MAIL_FROM
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: mail_from
+        - name: MAIL_TO
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: mail_to
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-secret
+              key: mail_password
+        - name: SMTP_HOST
+          value: "smtp.gmail.com"
+        - name: SMTP_PORT
+          value: "587"
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /logs
+      volumes:
+      - name: logs-volume
+        hostPath:
+          path: /mnt/auth-logs
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 5000
+    targetPort: 5000sudo chown myuser:myuser auth-deployment.yaml
+

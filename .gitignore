@@ -1,0 +1,18 @@
+# אל תעלה secrets או קבצים רגישים
+*.env
+.env*
+secrets/
+*.secret
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Docker
+.dockerignore
+
+# Logs
+*.log
+/mnt/auth-logs/
+/mnt/chromium-logs/
